@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  postgresql:
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: meetings
+    ports:
+      - '5432:5432'
