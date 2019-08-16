@@ -25,7 +25,8 @@ namespace MeetMe.Service
             services.AddControllers(o => o.Filters.Add(typeof(ExceptionFilter)));
 
             services.AddDbContext<MeetingsContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("MeetMeDb")));
+                options.UseNpgsql(Configuration.GetConnectionString("MeetMeDb"), 
+                    b => b.MigrationsAssembly("MeetMe.Service")));
 
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
             services.AddMediatR(typeof(GetMeetingQuery).GetTypeInfo().Assembly);

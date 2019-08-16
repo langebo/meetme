@@ -10,10 +10,10 @@ namespace MeetMe.Application.Validators
         {
             RuleFor(x => x.Title)
                 .NotEmpty();
-            
+            RuleFor(x => x.CreatedBy)
+                .NotEmpty();
             RuleFor(x => x.Proposals)
                 .NotEmpty();
-                
             RuleForEach(x => x.Proposals)
                 .GreaterThan(DateTimeOffset.Now);
         }

@@ -15,7 +15,6 @@ namespace MeetMe.Application.Validators
         public GetMeetingValidator(MeetingsContext db)
         {
             this.db = db;
-
             RuleFor(x => x.Id)
                 .MustAsync(MeetingExists);
         }
