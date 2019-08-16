@@ -21,8 +21,7 @@ namespace MeetMe.Application.Handlers
         {
             return await db.Meetings
                 .Include(m => m.Proposals)
-                .Include(m => m.Votes)
-                .ThenInclude(v => v.Proposal)
+                .ThenInclude(p => p.Votes)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == request.Id);
         }
