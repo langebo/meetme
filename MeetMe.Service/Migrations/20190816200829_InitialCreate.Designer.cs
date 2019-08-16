@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeetMe.Service.Migrations
 {
     [DbContext(typeof(MeetingsContext))]
-    [Migration("20190816183042_Init")]
-    partial class Init
+    [Migration("20190816200829_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -15,10 +15,8 @@ namespace MeetMe.Application.Validators
         public GetMeetingValidator(MeetingsContext db)
         {
             this.db = db;
-            // RuleFor(x => x.Id)
-            //     .MustAsync(MeetingExists);
-            RuleFor(x => x)
-                .Must(qry => true);
+            RuleFor(x => x.Id)
+                .MustAsync(MeetingExists);
         }
 
         private async Task<bool> MeetingExists(Guid id, CancellationToken ct) => 
