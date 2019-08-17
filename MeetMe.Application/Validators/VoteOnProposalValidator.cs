@@ -19,21 +19,14 @@ namespace MeetMe.Application.Validators
 
             RuleFor(x => x.Username)
                 .NotEmpty();
-            RuleFor(x => x.MeetingId)
-                .MustAsync(MeetingExists);
             RuleFor(x => x.ProposalId)
-                .MustAsync((cmd, id, ct) => ProposalBelongsToMeeting(cmd, ct));
+                .MustAsync(ProposalExists)
+                .WithMessage((cmd, id) => $"Proposal {id} does not exist");
         }
 
-        private async Task<bool> MeetingExists(Guid id, CancellationToken ct) => 
-            await db.Meetings
+        private async Task<bool> ProposalExists(Guid id, CancellationToken token) => 
+            await db.Proposals
                 .AsNoTracking()
-                .AnyAsync(m => m.Id == id, ct);
-
-        private async Task<bool> ProposalBelongsToMeeting(VoteOnProposalCommand cmd, CancellationToken ct) => 
-            await db.Meetings
-                .Include(m => m.Proposals)
-                .AnyAsync(m => m.Id == cmd.MeetingId &&
-                          m.Proposals.Any(p => p.Id == cmd.ProposalId), ct);
+                .AnyAsync(p => p.Id == id, token);
     }
 }

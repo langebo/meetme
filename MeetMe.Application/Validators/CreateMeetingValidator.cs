@@ -15,7 +15,8 @@ namespace MeetMe.Application.Validators
             RuleFor(x => x.Proposals)
                 .NotEmpty();
             RuleForEach(x => x.Proposals)
-                .GreaterThan(DateTimeOffset.Now);
+                .GreaterThan(DateTimeOffset.Now)
+                .WithMessage("Proposals must not be in the past");
         }
     }
 }
