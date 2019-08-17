@@ -25,12 +25,7 @@ namespace MeetMe.Service.Controllers
             Ok(await mediator.Send(cmd));
 
         [HttpPatch("{id:Guid}")]
-        public async Task<ActionResult<Meeting>> Vote(Guid id, [FromBody] VoteOnProposalCommand cmd) 
-        {
-            if(id != cmd.MeetingId)
-                return BadRequest("Id mismatch");
-
-            return Ok(await mediator.Send(cmd));
-        }
+        public async Task<ActionResult<Meeting>> Vote(Guid id, [FromBody] VoteOnProposalCommand cmd) => 
+            Ok(await mediator.Send(cmd));
     }
 }

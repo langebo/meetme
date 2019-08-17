@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MeetMe.Application.Handlers
 {
-    public class VoteOnProposalHandler : IRequestHandler<VoteOnProposalCommand, Meeting>
+    public class VoteOnProposalHandler : IRequestHandler<VoteOnProposalCommand, Proposal>
     {
         private readonly MeetingsContext db;
 
@@ -19,21 +19,24 @@ namespace MeetMe.Application.Handlers
             this.db = db;
         }
 
-        public async Task<Meeting> Handle(VoteOnProposalCommand request, CancellationToken cancellationToken)
+        public async Task<Proposal> Handle(VoteOnProposalCommand request, CancellationToken cancellationToken)
         {
-            var meeting = await db.Meetings
-                .Include(m => m.Proposals)
-                .ThenInclude(p => p.Votes)
-                .SingleAsync(m => m.Id == request.MeetingId, cancellationToken);
+            var proposal = await db.Proposals
+                .Include(p => p.Votes)
+                .SingleAsync(p => p.Id == request.ProposalId);
 
-            var proposal = meeting.Proposals.Single(p => p.Id == request.ProposalId);
-            var vote = proposal.Votes.FirstOrDefault(v => v.Username.Equals(request.Username, StringComparison.InvariantCultureIgnoreCase));
+            var vote = proposal.Votes
+                .FirstOrDefault(v => v.Username == request.Username);
+
             if (vote == null)
                 proposal.Votes.Add(new Vote { Username = request.Username });
             else
+            {
                 proposal.Votes.Remove(vote);
+                db.Votes.Remove(vote);
+            }
 
-            var result = db.Meetings.Attach(meeting);
+            var result = db.Proposals.Attach(proposal);
             await db.SaveChangesAsync(cancellationToken);
             return result.Entity;
         }

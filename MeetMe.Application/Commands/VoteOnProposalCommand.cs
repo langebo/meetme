@@ -4,9 +4,8 @@ using MeetMe.Domain.Models;
 
 namespace MeetMe.Application.Commands
 {
-    public class VoteOnProposalCommand : IRequest<Meeting>
+    public class VoteOnProposalCommand : IRequest<Proposal>
     {
-        public Guid MeetingId { get; set; }
         public Guid ProposalId { get; set; }
         public string Username { get; set; }
     }

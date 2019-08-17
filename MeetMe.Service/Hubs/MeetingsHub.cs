@@ -20,7 +20,7 @@ namespace MeetMe.Service.Hubs
         public async Task<Meeting> CreateMeeting(CreateMeetingCommand cmd) =>
             await mediator.Send(cmd);
 
-        public async Task<Meeting> Vote(VoteOnProposalCommand cmd) => 
+        public async Task<Proposal> Vote(VoteOnProposalCommand cmd) => 
             await mediator.Send(cmd);
     }
 }

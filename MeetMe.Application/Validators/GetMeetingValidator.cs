@@ -16,7 +16,8 @@ namespace MeetMe.Application.Validators
         {
             this.db = db;
             RuleFor(x => x.Id)
-                .MustAsync(MeetingExists);
+                .MustAsync(MeetingExists)
+                .WithMessage((cmd, id) => $"Meeting {id} does not exist");
         }
 
         private async Task<bool> MeetingExists(Guid id, CancellationToken ct) => 
