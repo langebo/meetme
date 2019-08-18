@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="7.0.0" />
+    <PackageReference Include="FluentValidation" Version="8.5.0-preview4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MeetMe.Domain\MeetMe.Domain.csproj" />
+    <ProjectReference Include="..\MeetMe.Authentication\MeetMe.Authentication.csproj" />
+  </ItemGroup>
+</Project>
