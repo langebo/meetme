@@ -19,19 +19,42 @@ namespace MeetMe.Service.Migrations
                 .HasAnnotation("ProductVersion", "3.0.0-preview8.19405.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            modelBuilder.Entity("MeetMe.Domain.Models.Invitation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("MeetingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MeetingId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Invitations");
+                });
+
             modelBuilder.Entity("MeetMe.Domain.Models.Meeting", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Title")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
 
                     b.ToTable("Meetings");
                 });
@@ -55,6 +78,23 @@ namespace MeetMe.Service.Migrations
                     b.ToTable("Proposals");
                 });
 
+            modelBuilder.Entity("MeetMe.Domain.Models.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("MeetMe.Domain.Models.Vote", b =>
                 {
                     b.Property<Guid>("Id")
@@ -64,14 +104,34 @@ namespace MeetMe.Service.Migrations
                     b.Property<Guid?>("ProposalId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Username")
-                        .HasColumnType("text");
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProposalId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Votes");
+                });
+
+            modelBuilder.Entity("MeetMe.Domain.Models.Invitation", b =>
+                {
+                    b.HasOne("MeetMe.Domain.Models.Meeting", null)
+                        .WithMany("Invitations")
+                        .HasForeignKey("MeetingId");
+
+                    b.HasOne("MeetMe.Domain.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("MeetMe.Domain.Models.Meeting", b =>
+                {
+                    b.HasOne("MeetMe.Domain.Models.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId");
                 });
 
             modelBuilder.Entity("MeetMe.Domain.Models.Proposal", b =>
@@ -86,6 +146,10 @@ namespace MeetMe.Service.Migrations
                     b.HasOne("MeetMe.Domain.Models.Proposal", null)
                         .WithMany("Votes")
                         .HasForeignKey("ProposalId");
+
+                    b.HasOne("MeetMe.Domain.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }

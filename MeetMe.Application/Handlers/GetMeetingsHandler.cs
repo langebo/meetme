@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -8,26 +10,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MeetMe.Application.Handlers
 {
-    public class GetMeetingHandler : IRequestHandler<GetMeetingQuery, Meeting>
+    public class GetMeetingsHandler : IRequestHandler<GetMeetingsQuery, List<Meeting>>
     {
         private readonly MeetingsContext db;
-
-        public GetMeetingHandler(MeetingsContext db)
+        public GetMeetingsHandler(MeetingsContext db)
         {
             this.db = db;
         }
-
-        public async Task<Meeting> Handle(GetMeetingQuery request, CancellationToken cancellationToken)
+        public async Task<List<Meeting>> Handle(GetMeetingsQuery request, CancellationToken cancellationToken)
         {
             return await db.Meetings
+                .AsNoTracking()
                 .Include(m => m.Creator)
                 .Include(m => m.Proposals)
                 .ThenInclude(p => p.Votes)
                 .ThenInclude(v => v.User)
                 .Include(m => m.Invitations)
                 .ThenInclude(i => i.User)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == request.Id);
+                .Where(m => m.Creator.Id == request.UserId)
+                .ToListAsync(cancellationToken);
         }
     }
 }

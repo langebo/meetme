@@ -8,12 +8,14 @@ namespace MeetMe.Application.Commands
     public class CreateMeetingCommand : IRequest<Meeting>
     {
         public string Title { get; set; }
-        public string CreatedBy { get; set; }
+        public Guid CreatorId { get; set; }
         public List<DateTimeOffset> Proposals { get; set; }
+        public List<Guid> InvitedUserIds { get; set; }
 
         public CreateMeetingCommand()
         {
             Proposals = new List<DateTimeOffset>();
+            InvitedUserIds = new List<Guid>();
         }
     }
 }
