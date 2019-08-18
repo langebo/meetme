@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,26 +9,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MeetMe.Application.Handlers
 {
-    public class VoteOnProposalHandler : IRequestHandler<VoteOnProposalCommand, Proposal>
+    public class VoteHandler : IRequestHandler<VoteCommand, Vote>
     {
         private readonly MeetingsContext db;
 
-        public VoteOnProposalHandler(MeetingsContext db)
+        public VoteHandler(MeetingsContext db)
         {
             this.db = db;
         }
 
-        public async Task<Proposal> Handle(VoteOnProposalCommand request, CancellationToken cancellationToken)
+        public async Task<Vote> Handle(VoteCommand request, CancellationToken cancellationToken)
         {
             var proposal = await db.Proposals
                 .Include(p => p.Votes)
                 .SingleAsync(p => p.Id == request.ProposalId);
 
+            var voter = await db.Users
+                .SingleAsync(u => u.Id == request.UserId);
+
             var vote = proposal.Votes
-                .FirstOrDefault(v => v.Username == request.Username);
+                .FirstOrDefault(v => v.User == voter);
 
             if (vote == null)
-                proposal.Votes.Add(new Vote { Username = request.Username });
+            {
+                vote = new Vote { User = voter };
+                proposal.Votes.Add(vote);
+            }
             else
             {
                 proposal.Votes.Remove(vote);
@@ -38,7 +43,7 @@ namespace MeetMe.Application.Handlers
 
             var result = db.Proposals.Attach(proposal);
             await db.SaveChangesAsync(cancellationToken);
-            return result.Entity;
+            return vote;
         }
     }
 }

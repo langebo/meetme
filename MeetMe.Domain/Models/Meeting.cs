@@ -7,12 +7,14 @@ namespace MeetMe.Domain.Models
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
-        public string CreatedBy { get; set; }
+        public User Creator { get; set; }
         public List<Proposal> Proposals { get; set; }
+        public List<Invitation> Invitations { get; set; }
 
         public Meeting()
         {
             Proposals = new List<Proposal>();
+            Invitations = new List<Invitation>();
         }
     }
 }
