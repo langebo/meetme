@@ -7,7 +7,7 @@ using MeetMe.Authentication.Interfaces;
 using MeetMe.Authentication.Services;
 using MeetMe.Domain.Contexts;
 using MeetMe.Service.Filters;
-using MeetMe.Service.Hubs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -26,20 +26,17 @@ namespace MeetMe.Service
         public void ConfigureServices(IServiceCollection services)
         {
             IdentityModelEventSource.ShowPII = true;
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = OktaDefaults.ApiAuthenticationScheme;
-                options.DefaultChallengeScheme = OktaDefaults.ApiAuthenticationScheme;
-                options.DefaultSignInScheme = OktaDefaults.ApiAuthenticationScheme;
-            })
-            .AddOktaWebApi(new OktaWebApiOptions { OktaDomain = "https://dev-594008.okta.com" });
 
-            services.AddAuthorization(options => 
-                options.AddPolicy("AuthenticatedUsers", authOptions => 
-                    authOptions.RequireAuthenticatedUser()));
+            services.AddAuthentication(OktaDefaults.ApiAuthenticationScheme)
+                .AddOktaWebApi(new OktaWebApiOptions { OktaDomain = "https://dev-594008.okta.com" });
 
-            services.AddSignalR();
-            services.AddControllers(o => o.Filters.Add(typeof(ExceptionFilter)));
+            services.AddAuthorization(options =>
+                options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build());
+
+            services.AddControllers(options =>
+                options.Filters.Add(typeof(ExceptionFilter)));
 
             services.AddDbContext<MeetingsContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("MeetMeDb"), 
@@ -58,22 +55,19 @@ namespace MeetMe.Service
         }
 
         public void Configure(IApplicationBuilder app)
-        {            
+        { 
             app.UseCors(options => options
                 .WithOrigins("http://localhost:3000")
                 .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials());
+                .AllowAnyMethod());            
+
+            app.UseRouting();
 
             app.UseAuthentication();
-            app.UseAuthorization();
-            
-            app.UseRouting();
+            app.UseAuthorization();   
+
             app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapHub<MeetingsHub>("/push");
-            });
+                endpoints.MapControllers());
         }
     }
 }

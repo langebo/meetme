@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from 'react'
-import { withAuth } from '@okta/okta-react'
-import UserList from '../components/UserList'
+import React from 'react';
+import MeetingList from '../components/MeetingList';
+import InvitationList from '../components/InvitationList';
+import User from '../components/User';
 
-const Dashboard = props => {
-    const [user, setUser] = useState({})
-    useEffect(() => {
-        props.auth.getUser()
-            .then(result => setUser(result));
-    }, [props])
-    
-    return (
-        <div>
-            <h1>Dashboard</h1>
-            <h2>welcome {user.name}</h2>
-            <UserList/>
-        </div>
-    );
-}
+const Dashboard = () => {
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <div>
+        <User />
+      </div>
+      <div>
+        <MeetingList />
+      </div>
+      <div>
+        <InvitationList />
+      </div>
+    </div>
+  );
+};
 
-export default withAuth(Dashboard)
+export default Dashboard;

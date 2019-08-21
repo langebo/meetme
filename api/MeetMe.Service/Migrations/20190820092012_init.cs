@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MeetMe.Service.Migrations
 {
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,8 +13,8 @@ namespace MeetMe.Service.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     Name = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(nullable: true),
-                    OidcIdentifier = table.Column<string>(nullable: true)
+                    Email = table.Column<string>(nullable: false),
+                    OidcIdentifier = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -128,6 +128,18 @@ namespace MeetMe.Service.Migrations
                 name: "IX_Proposals_MeetingId",
                 table: "Proposals",
                 column: "MeetingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_OidcIdentifier",
+                table: "Users",
+                column: "OidcIdentifier",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Votes_ProposalId",

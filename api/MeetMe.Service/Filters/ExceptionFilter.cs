@@ -24,13 +24,18 @@ namespace MeetMe.Service.Filters
                             errors[error.PropertyName] = $"{errors[error.PropertyName]}; {error.ErrorMessage}";
                     context.Result = new BadRequestObjectResult(errors);
                     break;
-                case NotFoundException _:
-                    context.HttpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                case UnauthorizedAccessException _:
+                    context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                     errors.Add("error", context.Exception.Message);
                     context.Result = new JsonResult(errors);
                     break;
                 case ForbiddenException _:
                     context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    errors.Add("error", context.Exception.Message);
+                    context.Result = new JsonResult(errors);
+                    break;
+                case NotFoundException _:
+                    context.HttpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     errors.Add("error", context.Exception.Message);
                     context.Result = new JsonResult(errors);
                     break;

@@ -17,13 +17,12 @@ namespace MeetMe.Authentication.Services
         public string GetUserIdentifier()
         {
             var user = accessor.HttpContext.User;
-            return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        }
+            var oidcNameIdentifier = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        public string GetUserEmail()
-        {
-            var user = accessor.HttpContext.User;
-            return user.FindFirst(ClaimTypes.Email)?.Value;
+            if(!user.Identity.IsAuthenticated || string.IsNullOrEmpty(oidcNameIdentifier))
+                throw new UnauthorizedAccessException("Unable retrieve nameIdentifier claim of user");
+
+            return oidcNameIdentifier;
         }
     }
 }

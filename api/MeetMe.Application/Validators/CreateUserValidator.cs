@@ -9,6 +9,8 @@ namespace MeetMe.Application.Validators
         {
             RuleFor(x => x.Name)
                 .NotEmpty();
+            RuleFor(x => x.Email)
+                .NotEmpty();
         }
     }
 }

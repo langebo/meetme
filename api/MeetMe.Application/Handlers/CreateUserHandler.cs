@@ -23,8 +23,8 @@ namespace MeetMe.Application.Handlers
             var result = await db.Users.AddAsync(new User
             {
                 Name = request.Name,
-                Email = auth.GetUserEmail(),
-                OidcIdentifier = auth.GetUserEmail()
+                Email = request.Email,
+                OidcIdentifier = auth.GetUserIdentifier()
             }, cancellationToken);
 
             await db.SaveChangesAsync(cancellationToken);

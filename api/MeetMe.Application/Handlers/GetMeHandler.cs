@@ -22,6 +22,7 @@ namespace MeetMe.Application.Handlers
         public async Task<User> Handle(GetMeQuery request, CancellationToken cancellationToken)
         {
             var oidcId = auth.GetUserIdentifier();
+            System.Console.WriteLine(oidcId);
             var me = await db.Users
                 .AsNoTracking()
                 .SingleOrDefaultAsync(u => u.OidcIdentifier == oidcId);

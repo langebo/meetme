@@ -38,6 +38,22 @@ namespace MeetMe.Domain.Contexts
             modelBuilder.Entity<Invitation>()
                 .HasOne(i => i.User)
                 .WithMany();
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.OidcIdentifier)
+                .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.OidcIdentifier)
+                .IsRequired();
+            
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.Email)
+                .IsRequired();
         }
     }
 }

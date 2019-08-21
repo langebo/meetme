@@ -1,27 +1,40 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import { Security, ImplicitCallback } from '@okta/okta-react';
-import Dashboard from './scenes/Dashboard'
-import Login from './scenes/Login'
+import { StateProvider } from './utils/simply';
+import Dashboard from './scenes/Dashboard';
 
-const config = {
-  issuer: 'https://dev-594008.okta.com/oauth2/default',
-  redirect_uri: window.location.origin + '/implicit/callback',
-  client_id: '0oa1561c1j3NHq1fh357'
-}
+const App = () => {
+  const initialState = {
+    user: { name: 'bobo', email: 'bobo@lala.com' },
+    meetings: [
+      { id: 423, title: 'sprint planning' },
+      { id: 424, title: 'grooming' },
+      { id: 425, title: 'review' },
+    ],
+    invitations: [
+      { id: 654, title: 'team event' },
+      { id: 871, title: 'meetup' },
+      { id: 962, title: 'breakfast' },
+      { id: 1007, title: 'team lead council' },
+    ],
+  };
 
-function App() {
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case 'setUser':
+        return {
+          ...state,
+          user: action.user,
+        };
+      default:
+        return state;
+    }
+  };
+
   return (
-    <Router>
-        <Security issuer={config.issuer}
-                  client_id={config.client_id}
-                  redirect_uri={config.redirect_uri}>
-          <Route path='/' exact={true} component={Login}/>
-          <Route path='/dashboard' exact={true} component={Dashboard}/>
-          <Route path='/implicit/callback' component={ImplicitCallback}/>
-        </Security>
-      </Router>
+    <StateProvider initialState={initialState} reducer={reducer}>
+      <Dashboard />
+    </StateProvider>
   );
-}
+};
 
 export default App;

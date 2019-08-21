@@ -9,9 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MeetMe.Service.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IMediator mediator;

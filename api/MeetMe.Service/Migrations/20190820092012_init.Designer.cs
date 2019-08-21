@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeetMe.Service.Migrations
 {
     [DbContext(typeof(MeetingsContext))]
-    [Migration("20190818223143_Init")]
-    partial class Init
+    [Migration("20190820092012_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -87,15 +87,23 @@ namespace MeetMe.Service.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
                     b.Property<string>("OidcIdentifier")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("OidcIdentifier")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
