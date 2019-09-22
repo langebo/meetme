@@ -1,4 +1,7 @@
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -15,6 +18,7 @@ namespace MeetMe.Application.Handlers
     {
         private readonly MeetingsContext db;
         private readonly IAuthenticationService auth;
+
         public GetMeetingHandler(MeetingsContext db, IAuthenticationService auth)
         {
             this.db = db;
@@ -23,24 +27,30 @@ namespace MeetMe.Application.Handlers
 
         public async Task<Meeting> Handle(GetMeetingQuery request, CancellationToken cancellationToken)
         {
+            var userOidc = auth.GetUserIdentifier();
+            var user = await db.Users
+                .AsNoTracking()
+                .SingleOrDefaultAsync(u => u.OidcIdentifier == userOidc, cancellationToken);
+
+            if (user == null)
+                throw new NotFoundException($"Unable to find user {userOidc}");
+
             var meeting = await db.Meetings
+                .AsNoTracking()
                 .Include(m => m.Creator)
                 .Include(m => m.Proposals)
-                .ThenInclude(p => p.Votes)
-                .ThenInclude(v => v.User)
                 .Include(m => m.Invitations)
                 .ThenInclude(i => i.User)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.Id == request.Id);
+                .Include(m => m.Invitations)
+                .ThenInclude(i => i.Votes)
+                .FirstOrDefaultAsync(m => m.Id == request.Id, cancellationToken);
 
             if (meeting == null)
-                throw new NotFoundException($"Meeting {request.Id} does not exist");
+                throw new NotFoundException($"Unable to find meeting {request.Id}");
 
-            var oidcId = auth.GetUserIdentifier();
-            if (meeting.Creator.OidcIdentifier != oidcId || 
-                !meeting.Invitations.Select(i => i.User.OidcIdentifier).Contains(oidcId))
-                throw new ForbiddenException($"User {oidcId} is not allowed to access meeting {request.Id}");
-            
+            if (meeting.Creator.Id != user.Id && meeting.Invitations.All(i => i.User.Id != user.Id))
+                throw new ForbiddenException($"User {user.OidcIdentifier} is no eligible to view meeting {request.Id}");
+
             return meeting;
         }
     }

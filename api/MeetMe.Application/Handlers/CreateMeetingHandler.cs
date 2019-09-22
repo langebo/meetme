@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -15,6 +15,7 @@ namespace MeetMe.Application.Handlers
     {
         private readonly MeetingsContext db;
         private readonly IAuthenticationService auth;
+
         public CreateMeetingHandler(MeetingsContext db, IAuthenticationService auth)
         {
             this.db = db;
@@ -23,33 +24,29 @@ namespace MeetMe.Application.Handlers
 
         public async Task<Meeting> Handle(CreateMeetingCommand request, CancellationToken cancellationToken)
         {
-            var invitations = await db.Users
+            var userOidc = auth.GetUserIdentifier();
+            var user = await db.Users
+                .SingleOrDefaultAsync(u => u.OidcIdentifier == userOidc, cancellationToken);
+
+            if (user == null)
+                throw new NotFoundException($"Unable to find user with {userOidc}");
+
+            var invited = await db.Users
                 .Where(u => request.InvitedUserIds.Contains(u.Id))
                 .ToListAsync(cancellationToken);
 
-            if (invitations.Count != request.InvitedUserIds.Count)
+            invited.Add(user);
+
+            var result = await db.Meetings.AddAsync(new Meeting
             {
-                request.InvitedUserIds.RemoveAll(u => invitations.Select(i => i.Id).Contains(u));
-                var missingUserIdsString = string.Join(", ", request.InvitedUserIds.Select(i => $"{i}"));
-                throw new NotFoundException($"Invited user(s) do(es) not exist: {missingUserIdsString}");
-            }
-
-            var oidcId = auth.GetUserIdentifier();
-            var creator = await db.Users.SingleOrDefaultAsync(u => u.OidcIdentifier == oidcId, cancellationToken);
-
-            if (creator == null)
-                throw new NotFoundException($"User {oidcId} does not exist");
-
-            var meeting = await db.Meetings.AddAsync(new Meeting
-            {
+                Creator = user,
                 Title = request.Title,
-                Creator = creator,
-                Proposals = request.Proposals.Select(p => new Proposal { Time = p }).ToList(),
-                Invitations = invitations.Select(i => new Invitation { User = i }).ToList()
+                Invitations = invited.Select(i => new Invitation {User = i}).ToList(),
+                Proposals = request.Proposals.Select(p => new Proposal {Time = p}).ToList(),
             }, cancellationToken);
 
             await db.SaveChangesAsync(cancellationToken);
-            return meeting.Entity;
+            return result.Entity;
         }
     }
 }

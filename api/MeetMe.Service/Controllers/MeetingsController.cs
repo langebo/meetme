@@ -12,7 +12,7 @@ namespace MeetMe.Service.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize]
+    //[Authorize]
     public class MeetingsController : ControllerBase
     {
         private readonly IMediator mediator;
@@ -32,7 +32,7 @@ namespace MeetMe.Service.Controllers
             Ok(await mediator.Send(cmd));
 
         [HttpPost("{id:Guid}/invite")]
-        public async Task<ActionResult<Meeting>> Invite(Guid id, [FromBody] AddInvitationCommand cmd)
+        public async Task<ActionResult<Meeting>> Invite(Guid id, [FromBody] InviteCommand cmd)
         {
             if (id != cmd.MeetingId)
                 return BadRequest("Mismatching MeetingId between body and query parameters");
@@ -40,8 +40,8 @@ namespace MeetMe.Service.Controllers
             return Ok(await mediator.Send(cmd));
         }
 
-        [HttpPost("{id:Guid}/uninvite")]
-        public async Task<ActionResult<Meeting>> Uninvite(Guid id, [FromBody] RemoveInvitationCommand cmd)
+        [HttpPost("{id:Guid}/eject")]
+        public async Task<ActionResult<Meeting>> Eject(Guid id, [FromBody] EjectCommand cmd)
         {
             if (id != cmd.MeetingId)
                 return BadRequest("Mismatching MeetingId between body and query parameters");
@@ -49,5 +49,22 @@ namespace MeetMe.Service.Controllers
             return Ok(await mediator.Send(cmd));
         }
 
+        [HttpPost("{id:Guid}/vote")]
+        public async Task<ActionResult<Meeting>> Vote(Guid id, [FromBody] VoteCommand cmd)
+        {
+            if (id != cmd.MeetingId)
+                return BadRequest("Mismatching MeetingId between body and query parameters");
+
+            return Ok(await mediator.Send(cmd));
+        }
+
+        [HttpPost("{id:Guid}/retract")]
+        public async Task<ActionResult<Meeting>> Retract(Guid id, [FromBody] RetractCommand cmd)
+        {
+            if (id != cmd.MeetingId)
+                return BadRequest("Mismatching MeetingId between body and query parameters");
+
+            return Ok(await mediator.Send(cmd));
+        }
     }
 }

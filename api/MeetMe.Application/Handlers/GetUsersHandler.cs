@@ -1,9 +1,8 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using MeetMe.Application.Queries;
-using MeetMe.Authentication.Interfaces;
 using MeetMe.Domain.Contexts;
 using MeetMe.Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +12,7 @@ namespace MeetMe.Application.Handlers
     public class GetUsersHandler : IRequestHandler<GetUsersQuery, List<User>>
     {
         private readonly MeetingsContext db;
+
         public GetUsersHandler(MeetingsContext db)
         {
             this.db = db;
@@ -22,7 +22,7 @@ namespace MeetMe.Application.Handlers
         {
             return await db.Users
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
     }
 }

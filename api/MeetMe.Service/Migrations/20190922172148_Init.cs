@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MeetMe.Service.Migrations
 {
-    public partial class init : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -66,47 +66,40 @@ namespace MeetMe.Service.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Proposals",
+                name: "Proposal",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Time = table.Column<DateTimeOffset>(nullable: false),
-                    MeetingId = table.Column<Guid>(nullable: true)
+                    MeetingId = table.Column<Guid>(nullable: false),
+                    Time = table.Column<DateTimeOffset>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Proposals", x => x.Id);
+                    table.PrimaryKey("PK_Proposal", x => new { x.MeetingId, x.Id });
                     table.ForeignKey(
-                        name: "FK_Proposals_Meetings_MeetingId",
+                        name: "FK_Proposal_Meetings_MeetingId",
                         column: x => x.MeetingId,
                         principalTable: "Meetings",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Votes",
+                name: "Vote",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    UserId = table.Column<Guid>(nullable: true),
-                    ProposalId = table.Column<Guid>(nullable: true)
+                    InvitationId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Votes", x => x.Id);
+                    table.PrimaryKey("PK_Vote", x => new { x.InvitationId, x.Id });
                     table.ForeignKey(
-                        name: "FK_Votes_Proposals_ProposalId",
-                        column: x => x.ProposalId,
-                        principalTable: "Proposals",
+                        name: "FK_Vote_Invitations_InvitationId",
+                        column: x => x.InvitationId,
+                        principalTable: "Invitations",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Votes_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -125,11 +118,6 @@ namespace MeetMe.Service.Migrations
                 column: "CreatorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Proposals_MeetingId",
-                table: "Proposals",
-                column: "MeetingId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email",
@@ -140,28 +128,18 @@ namespace MeetMe.Service.Migrations
                 table: "Users",
                 column: "OidcIdentifier",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Votes_ProposalId",
-                table: "Votes",
-                column: "ProposalId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Votes_UserId",
-                table: "Votes",
-                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Proposal");
+
+            migrationBuilder.DropTable(
+                name: "Vote");
+
+            migrationBuilder.DropTable(
                 name: "Invitations");
-
-            migrationBuilder.DropTable(
-                name: "Votes");
-
-            migrationBuilder.DropTable(
-                name: "Proposals");
 
             migrationBuilder.DropTable(
                 name: "Meetings");

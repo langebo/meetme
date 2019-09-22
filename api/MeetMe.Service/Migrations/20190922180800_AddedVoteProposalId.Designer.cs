@@ -10,15 +10,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeetMe.Service.Migrations
 {
     [DbContext(typeof(MeetingsContext))]
-    [Migration("20190820092012_init")]
-    partial class init
+    [Migration("20190922180800_AddedVoteProposalId")]
+    partial class AddedVoteProposalId
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.0.0-preview8.19405.11")
+                .HasAnnotation("ProductVersion", "3.0.0-rc1.19456.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("MeetMe.Domain.Models.Invitation", b =>
@@ -61,25 +61,6 @@ namespace MeetMe.Service.Migrations
                     b.ToTable("Meetings");
                 });
 
-            modelBuilder.Entity("MeetMe.Domain.Models.Proposal", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("MeetingId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MeetingId");
-
-                    b.ToTable("Proposals");
-                });
-
             modelBuilder.Entity("MeetMe.Domain.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -108,27 +89,6 @@ namespace MeetMe.Service.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MeetMe.Domain.Models.Vote", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ProposalId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProposalId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Votes");
-                });
-
             modelBuilder.Entity("MeetMe.Domain.Models.Invitation", b =>
                 {
                     b.HasOne("MeetMe.Domain.Models.Meeting", null)
@@ -138,6 +98,26 @@ namespace MeetMe.Service.Migrations
                     b.HasOne("MeetMe.Domain.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+
+                    b.OwnsMany("MeetMe.Domain.Models.Vote", "Votes", b1 =>
+                        {
+                            b1.Property<Guid>("InvitationId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("ProposalId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("InvitationId", "Id");
+
+                            b1.ToTable("Vote");
+
+                            b1.WithOwner()
+                                .HasForeignKey("InvitationId");
+                        });
                 });
 
             modelBuilder.Entity("MeetMe.Domain.Models.Meeting", b =>
@@ -145,24 +125,26 @@ namespace MeetMe.Service.Migrations
                     b.HasOne("MeetMe.Domain.Models.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId");
-                });
 
-            modelBuilder.Entity("MeetMe.Domain.Models.Proposal", b =>
-                {
-                    b.HasOne("MeetMe.Domain.Models.Meeting", null)
-                        .WithMany("Proposals")
-                        .HasForeignKey("MeetingId");
-                });
+                    b.OwnsMany("MeetMe.Domain.Models.Proposal", "Proposals", b1 =>
+                        {
+                            b1.Property<Guid>("MeetingId")
+                                .HasColumnType("uuid");
 
-            modelBuilder.Entity("MeetMe.Domain.Models.Vote", b =>
-                {
-                    b.HasOne("MeetMe.Domain.Models.Proposal", null)
-                        .WithMany("Votes")
-                        .HasForeignKey("ProposalId");
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uuid");
 
-                    b.HasOne("MeetMe.Domain.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                            b1.Property<DateTimeOffset>("Time")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.HasKey("MeetingId", "Id");
+
+                            b1.ToTable("Proposal");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MeetingId");
+                        });
                 });
 #pragma warning restore 612, 618
         }

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using MeetMe.Application.Commands;
@@ -11,18 +10,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MeetMe.Application.Handlers
 {
-    public class VoteHandler : IRequestHandler<VoteCommand, Meeting>
+    public class InviteHandler : IRequestHandler<InviteCommand, Meeting>
     {
         private readonly MeetingsContext db;
         private readonly IAuthenticationService auth;
 
-        public VoteHandler(MeetingsContext db, IAuthenticationService auth)
+        public InviteHandler(MeetingsContext db, IAuthenticationService auth)
         {
             this.db = db;
             this.auth = auth;
         }
 
-        public async Task<Meeting> Handle(VoteCommand request, CancellationToken cancellationToken)
+        public async Task<Meeting> Handle(InviteCommand request, CancellationToken cancellationToken)
         {
             var userOidc = auth.GetUserIdentifier();
             var user = await db.Users
@@ -31,6 +30,12 @@ namespace MeetMe.Application.Handlers
 
             if (user == null)
                 throw new NotFoundException($"Unable to find user {userOidc}");
+
+            var invitedUser = await db.Users
+                .SingleOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+
+            if (user == null)
+                throw new NotFoundException($"Unable to find user {request.UserId}");
 
             var meeting = await db.Meetings
                 .Include(m => m.Creator)
@@ -44,13 +49,10 @@ namespace MeetMe.Application.Handlers
             if (meeting == null)
                 throw new NotFoundException($"Unable to find meeting {request.MeetingId}");
 
-            if (meeting.Invitations.All(i => i.User.Id != user.Id))
-                throw new ForbiddenException($"User {user.OidcIdentifier} is not eligible to vote on meeting {request.MeetingId}");
+            if (meeting.Creator.Id != user.Id)
+                throw new ForbiddenException($"User {user.OidcIdentifier} is not eligible to view meeting {request.MeetingId}");
 
-            if (meeting.Proposals.All(p => p.Id != request.ProposalId))
-                throw new NotFoundException($"Unable to find proposal {request.ProposalId} on meeting {request.MeetingId}");
-
-            meeting.Invitations.Single(i => i.User.Id == user.Id).Votes.Add(new Vote {ProposalId = request.ProposalId});
+            meeting.Invitations.Add(new Invitation{User = invitedUser});
 
             var result = db.Meetings.Attach(meeting);
             await db.SaveChangesAsync(cancellationToken);

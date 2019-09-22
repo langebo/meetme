@@ -11,18 +11,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MeetMe.Application.Handlers
 {
-    public class VoteHandler : IRequestHandler<VoteCommand, Meeting>
+    public class RetractHandler : IRequestHandler<RetractCommand, Meeting>
     {
         private readonly MeetingsContext db;
         private readonly IAuthenticationService auth;
 
-        public VoteHandler(MeetingsContext db, IAuthenticationService auth)
+        public RetractHandler(MeetingsContext db, IAuthenticationService auth)
         {
             this.db = db;
             this.auth = auth;
         }
 
-        public async Task<Meeting> Handle(VoteCommand request, CancellationToken cancellationToken)
+        public async Task<Meeting> Handle(RetractCommand request, CancellationToken cancellationToken)
         {
             var userOidc = auth.GetUserIdentifier();
             var user = await db.Users
@@ -50,7 +50,8 @@ namespace MeetMe.Application.Handlers
             if (meeting.Proposals.All(p => p.Id != request.ProposalId))
                 throw new NotFoundException($"Unable to find proposal {request.ProposalId} on meeting {request.MeetingId}");
 
-            meeting.Invitations.Single(i => i.User.Id == user.Id).Votes.Add(new Vote {ProposalId = request.ProposalId});
+            meeting.Invitations.Single(i => i.User.Id == user.Id).Votes
+                .RemoveAll(v => v.ProposalId == request.ProposalId);
 
             var result = db.Meetings.Attach(meeting);
             await db.SaveChangesAsync(cancellationToken);

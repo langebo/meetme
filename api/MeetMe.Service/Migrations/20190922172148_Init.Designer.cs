@@ -3,15 +3,17 @@ using System;
 using MeetMe.Domain.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace MeetMe.Service.Migrations
 {
     [DbContext(typeof(MeetingsContext))]
-    partial class MeetingsContextModelSnapshot : ModelSnapshot
+    [Migration("20190922172148_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,9 +106,6 @@ namespace MeetMe.Service.Migrations
 
                             b1.Property<Guid>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid");
-
-                            b1.Property<Guid>("ProposalId")
                                 .HasColumnType("uuid");
 
                             b1.HasKey("InvitationId", "Id");

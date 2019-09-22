@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using MeetMe.Application.Exceptions;
@@ -12,25 +12,26 @@ namespace MeetMe.Application.Handlers
 {
     public class GetMeHandler : IRequestHandler<GetMeQuery, User>
     {
-        private readonly IAuthenticationService auth;
         private readonly MeetingsContext db;
-        public GetMeHandler(IAuthenticationService auth, MeetingsContext db)
+        private readonly IAuthenticationService auth;
+
+        public GetMeHandler(MeetingsContext db, IAuthenticationService auth)
         {
-            this.auth = auth;
             this.db = db;
+            this.auth = auth;
         }
+
         public async Task<User> Handle(GetMeQuery request, CancellationToken cancellationToken)
         {
-            var oidcId = auth.GetUserIdentifier();
-            System.Console.WriteLine(oidcId);
-            var me = await db.Users
+            var userOidc = auth.GetUserIdentifier();
+            var user = await db.Users
                 .AsNoTracking()
-                .SingleOrDefaultAsync(u => u.OidcIdentifier == oidcId);
+                .SingleOrDefaultAsync(u => u.OidcIdentifier == userOidc, cancellationToken);
 
-            if (me == null)
-                throw new NotFoundException($"Could not find user {oidcId}");
+            if (user == null)
+                throw new NotFoundException($"Unable to find user {userOidc}");
 
-            return me;
+            return user;
         }
     }
 }
