@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.0.0-rc1.19456.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MeetMe.Authentication\MeetMe.Authentication.csproj" />
+    <ProjectReference Include="..\MeetMe.Domain\MeetMe.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
