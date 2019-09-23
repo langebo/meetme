@@ -1,20 +1,14 @@
 import React from 'react';
 import MeetingList from '../components/MeetingList';
-import InvitationList from '../components/InvitationList';
 import User from '../components/User';
+import styled from 'styled-components'
 
 const Dashboard = () => {
   return (
     <div>
       <h1>Dashboard</h1>
       <div>
-        <User />
-      </div>
-      <div>
         <MeetingList />
-      </div>
-      <div>
-        <InvitationList />
       </div>
     </div>
   );

@@ -1,20 +1,30 @@
-import React from 'react';
-import { useStateContext } from '../utils/simply';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Stack } from 'office-ui-fabric-react'
+
 import Meeting from './Meeting';
+import { setMeetings } from '../store/actions'
+import api from '../utils/api'
 
 const MeetingList = () => {
-  const [state] = useStateContext();
+  const meetings = useSelector(state => state.meetings)
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    api.get('/meetings')
+      .then(response => dispatch(setMeetings(response.data)))
+      .catch(error => console.error(error));
+  }, [dispatch])
+
+  const sectionStackTokens = {
+    childrenGap: 12
+  };
 
   return (
     <div>
-      <h2>My meetings</h2>
-      <ul>
-        {state.meetings.map(meeting => (
-          <li key={meeting.id}>
-            <Meeting meeting={meeting} />
-          </li>
-        ))}
-      </ul>
+      <Stack tokens={sectionStackTokens}>
+        {meetings.map(meeting => <Meeting {...meeting} />)}
+      </Stack>
     </div>
   );
 };

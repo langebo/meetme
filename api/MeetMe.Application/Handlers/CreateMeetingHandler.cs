@@ -35,7 +35,7 @@ namespace MeetMe.Application.Handlers
                 .Where(u => request.InvitedUserIds.Contains(u.Id))
                 .ToListAsync(cancellationToken);
 
-            invited.Add(user);
+            //invited.Add(user);
 
             var result = await db.Meetings.AddAsync(new Meeting
             {
