@@ -1,14 +1,12 @@
 import React from 'react';
-import MeetingList from '../components/MeetingList';
-import User from '../components/User';
-import styled from 'styled-components'
+import MeetingStack from '../components/MeetingStack';
 
 const Dashboard = () => {
   return (
     <div>
       <h1>Dashboard</h1>
       <div>
-        <MeetingList />
+        <MeetingStack />
       </div>
     </div>
   );

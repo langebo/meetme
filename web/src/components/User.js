@@ -11,7 +11,10 @@ const User = () => {
 
   useEffect(() => {
     api.get('/users/me')
-      .then(response => dispatch(setUser(response.data)))
+      .then(response => {
+        console.log(response.data);
+        return dispatch(setUser(response.data));
+      })
       .catch(error => console.error(error));
   }, [dispatch]);
 
@@ -19,6 +22,7 @@ const User = () => {
     text: user.name,
     secondaryText: user.email,
     imageInitials: generateInitials(user.name),
+    initialsColor: user.id ? `#${user.id.substring(0, 6)}` : '#FFFFFF',
     dir: 'rtl',
     styles: {
       primaryText: { textAlign: 'right' },

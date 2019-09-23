@@ -44,7 +44,7 @@ const Header = styled.span`
 `
 
 const HeaderAccent = styled.span`
-  color: #b71540;
+  color: #2980b9;
   font-weight: 600;
 `
 

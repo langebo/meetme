@@ -6,7 +6,7 @@ import Meeting from './Meeting';
 import { setMeetings } from '../store/actions'
 import api from '../utils/api'
 
-const MeetingList = () => {
+const MeetingStack = () => {
   const meetings = useSelector(state => state.meetings)
   const dispatch = useDispatch();
 
@@ -23,10 +23,10 @@ const MeetingList = () => {
   return (
     <div>
       <Stack tokens={sectionStackTokens}>
-        {meetings.map(meeting => <Meeting {...meeting} />)}
+        {meetings.map(meeting => <Meeting key={meeting.id} {...meeting} />)}
       </Stack>
     </div>
   );
 };
 
-export default MeetingList;
+export default MeetingStack;
