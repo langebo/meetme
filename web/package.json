@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@uifabric/react-cards": "^0.108.1",
-    "axios": "^0.21.1",
+    "axios": "^1.6.0",
     "office-ui-fabric-react": "^7.37.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
